@@ -21,7 +21,7 @@ with st.sidebar:
     st.header("settings")
 
     ## API key
-    api_key= st.text_input("GROQ API KEY", type="password",help="GET Free API Key at console.groq.com")
+    # api_key= st.text_input("GROQ API KEY", type="password",help="GET Free API Key at console.groq.com")
 
     ## Model selection
     model_name= st.selectbox(
@@ -32,12 +32,15 @@ with st.sidebar:
 
     # clear button
     if st.button("clear chat"):
-        st.session_state.message=()
+        st.session_state.message=[]
         st.rerun()
 
 # Initialize chat history
 if "messages" not in st.session_state:
     st.session_state.messages= []
+
+# Get Groq API key from Streamlit Secrets
+api_key = st.secrets.get("GROQ_API_KEY", os.getenv("GROQ_API_KEY", ""))
 
 ## Initialize LLM
 @st.cache_resource
@@ -65,9 +68,7 @@ def get_chain(api_key, model_name):
 chain= get_chain(api_key, model_name)
 
 if not chain:
-    st.warning("please enter your groq API key in the sidebar to start chatting!")
-    st.markdown("[get your free api key here](https://console.groq.com)")
-
+    st.error("Groq API key is not configured.")
 else:
     ## Display the chat messages
 
